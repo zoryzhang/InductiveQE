@@ -347,6 +347,7 @@ class InductiveFB15k237Comp(LogicalQueryDataset):
             structs = sorted(struct2queries.keys(), key=lambda s: self.struct2type[s])
             if verbose:
                 structs = tqdm(structs, "Loading %s queries" % split)
+
             for struct in structs:
                 query_type = self.struct2type[struct]
                 if query_type not in self.type2id:
@@ -360,11 +361,15 @@ class InductiveFB15k237Comp(LogicalQueryDataset):
                     # The dataset format is slightly different from BetaE's
                     easy_answers.append(query2easy_answers[struct][query])
                     hard_answers.append(query2hard_answers[struct][query])
-                    query = Query.from_nested(query)
+
+                    # CHANGED HERE
+                    #query = Query.from_nested(query)
+
                     #query = self.to_postfix_notation(query)
                     max_query_length = max(max_query_length, len(query))
                     queries.append(query)
                     type_ids.append(self.type2id[query_type])
+
                 num_sample += len(struct_queries)
             num_entity_for_sample += [getattr(self, "%s_graph" % split).num_node.item()] * num_sample
             num_samples.append(num_sample)
@@ -411,10 +416,11 @@ class InductiveFB15k237Comp(LogicalQueryDataset):
         # num_entity in the inductive setup is different for different splits, take it from the relevant graph
         num_entity = self.num_entity_for_sample[index]
         return {
-            "query": F.pad(query, (0, self.max_query_length - len(query)), value=query.stop),
+            #"query": F.pad(query, (0, self.max_query_length - len(query)), value=query.stop),
+            "query": query,
             "type": self.types[index],
-            "easy_answer": functional.as_mask(easy_answer, num_entity),
-            "hard_answer": functional.as_mask(hard_answer, num_entity),
+            "easy_answer": easy_answer,
+            "hard_answer": hard_answer,
         }
 
 

@@ -240,6 +240,7 @@ class InductiveLogicalQuery(LogicalQuery):
         """
         :param limit_nodes: if not None, use ranks for only those specified nodes, mask others to -inf
         """
+        raise NotImplementedError("batch_evaluate not implemented")
         type, easy_answer, hard_answer = target
 
         num_easy = easy_answer.sum(dim=-1)
